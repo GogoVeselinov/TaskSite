@@ -1,0 +1,69 @@
+{% extends 'to_do_app/base.html' %}
+
+{% block title %}Tags | To-Do App{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h1 class="h2">
+            <i class="fas fa-tags me-2"></i>Tags
+        </h1>
+        <p class="text-muted">Manage your task tags</p>
+    </div>
+    <div class="col-auto align-self-center">
+        <a href="{% url 'tag_create' %}" class="btn btn-primary">
+            <i class="fas fa-plus me-1"></i>New Tag
+        </a>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">All Tags</h5>
+    </div>
+    {% if tags %}
+        <div class="card-body">
+            <div class="row">
+                {% for tag in tags %}
+                    <div class="col-md-4 col-lg-3 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body d-flex flex-column">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 class="card-title mb-0">
+                                        <span class="badge bg-secondary p-2">{{ tag.name }}</span>
+                                    </h5>
+                                    <span class="badge bg-primary">{{ tag.tasks.count }} task(s)</span>
+                                </div>
+                                <div class="mt-auto">
+                                    <div class="btn-group w-100">
+                                        <a href="{% url 'task_list' %}?tags={{ tag.id }}" class="btn btn-sm btn-outline-secondary">
+                                            <i class="fas fa-eye me-1"></i>View Tasks
+                                        </a>
+                                        <a href="{% url 'tag_edit' tag_id=tag.id %}" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{% url 'tag_delete' tag_id=tag.id %}" class="btn btn-sm btn-outline-danger">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% else %}
+        <div class="card-body text-center py-5">
+            <div class="display-1 text-muted mb-4">
+                <i class="fas fa-tags"></i>
+            </div>
+            <h3 class="mb-3">No Tags Yet</h3>
+            <p class="text-muted mb-4">Start organizing your tasks by creating tags.</p>
+            <a href="{% url 'tag_create' %}" class="btn btn-lg btn-primary">
+                <i class="fas fa-plus me-2"></i>Create Your First Tag
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

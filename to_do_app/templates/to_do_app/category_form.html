@@ -1,0 +1,83 @@
+{% extends 'to_do_app/base.html' %}
+
+{% block title %}{{ title }} | To-Do App{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'category_list' %}">Categories</a></li>
+        {% if object %}
+            <li class="breadcrumb-item active">Edit {{ object.name }}</li>
+        {% else %}
+            <li class="breadcrumb-item active">New Category</li>
+        {% endif %}
+    </ol>
+</nav>
+
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h1 class="h3 mb-0">{{ title }}</h1>
+            </div>
+            <div class="card-body">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    
+                    {% for error in form.non_field_errors %}
+                        <div class="alert alert-danger">{{ error }}</div>
+                    {% endfor %}
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.name.id_for_label }}" class="form-label fw-bold">{{ form.name.label }}</label>
+                        {{ form.name }}
+                        {% if form.name.errors %}
+                            <div class="invalid-feedback d-block">{{ form.name.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="{{ form.color.id_for_label }}" class="form-label fw-bold">{{ form.color.label }}</label>
+                        <div class="d-flex flex-wrap" id="color-preview-container">
+                            {% for color_value, color_name in form.fields.color.widget.choices %}
+                                <div class="form-check form-check-inline mb-2">
+                                    <input class="form-check-input" type="radio" name="{{ form.color.name }}" 
+                                           id="color_{{ color_value }}" value="{{ color_value }}"
+                                           {% if form.color.value == color_value or not form.color.value and forloop.first %}checked{% endif %}>
+                                    <label class="form-check-label" for="color_{{ color_value }}">
+                                        <span class="badge bg-{{ color_value }} p-2">{{ color_name }}</span>
+                                    </label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        {% if form.color.errors %}
+                            <div class="invalid-feedback d-block">{{ form.color.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i>Save Category
+                        </button>
+                        <a href="{% url 'category_list' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times me-1"></i>Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var nameInput = document.getElementById('{{ form.name.auto_id }}');
+        if (nameInput) {
+            nameInput.focus();
+        }
+    });
+</script>
+{% endblock %}

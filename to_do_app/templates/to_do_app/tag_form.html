@@ -1,0 +1,92 @@
+{% extends 'to_do_app/base.html' %}
+
+{% block title %}{{ title }} | To-Do App{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'tag_list' %}">Tags</a></li>
+        {% if object %}
+            <li class="breadcrumb-item active">Edit {{ object.name }}</li>
+        {% else %}
+            <li class="breadcrumb-item active">New Tag</li>
+        {% endif %}
+    </ol>
+</nav>
+
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h1 class="h3 mb-0">{{ title }}</h1>
+            </div>
+            <div class="card-body">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    
+                    {% for error in form.non_field_errors %}
+                        <div class="alert alert-danger">{{ error }}</div>
+                    {% endfor %}
+                    
+                    <div class="mb-4">
+                        <label for="{{ form.name.id_for_label }}" class="form-label fw-bold">{{ form.name.label }}</label>
+                        {{ form.name }}
+                        {% if form.name.errors %}
+                            <div class="invalid-feedback d-block">{{ form.name.errors.0 }}</div>
+                        {% endif %}
+                        <div class="form-text">
+                            Tag names will be normalized (lowercase, spaces converted to hyphens).
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i>Save Tag
+                        </button>
+                        <a href="{% url 'tag_list' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times me-1"></i>Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+            
+            {% if object %}
+                <div class="card-footer bg-light">
+                    <h6 class="mb-2">Tasks with this tag:</h6>
+                    {% if object.tasks.exists %}
+                        <div class="list-group list-group-flush small">
+                            {% for task in object.tasks.all|slice:":5" %}
+                                <a href="{% url 'task_detail' task_id=task.id %}" class="list-group-item list-group-item-action">
+                                    {{ task.title }}
+                                    {% if task.completed %}
+                                        <span class="badge bg-success float-end">Completed</span>
+                                    {% endif %}
+                                </a>
+                            {% endfor %}
+                            {% if object.tasks.count > 5 %}
+                                <a href="{% url 'task_list' %}?tags={{ object.id }}" class="list-group-item list-group-item-action text-center text-primary">
+                                    <i class="fas fa-ellipsis-h me-1"></i>View all {{ object.tasks.count }} tasks
+                                </a>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted mb-0">No tasks are using this tag.</p>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var nameInput = document.getElementById('{{ form.name.auto_id }}');
+        if (nameInput) {
+            nameInput.focus();
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,118 @@
+
+/* Custom styles for the To-Do App */
+
+/* Task priority indicators */
+.priority-1 { border-left: 5px solid #17a2b8; } /* Low - info color */
+.priority-2 { border-left: 5px solid #6c757d; } /* Medium - secondary color */
+.priority-3 { border-left: 5px solid #ffc107; } /* High - warning color */
+.priority-4 { border-left: 5px solid #dc3545; } /* Urgent - danger color */
+
+/* Sidebar styling */
+.sidebar {
+    position: sticky;
+    top: 20px;
+}
+
+/* Task card animations */
+.task-card {
+    transition: all 0.2s;
+}
+.task-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Dashboard stat card animations */
+.stat-card {
+    transition: all 0.3s ease;
+}
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+/* Tag styling */
+.tag-badge {
+    font-size: 0.75em;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    display: inline-block;
+}
+
+/* Completed task styling */
+.completed-task {
+    text-decoration: line-through;
+    color: #6c757d;
+}
+
+/* Overdue tasks */
+.overdue {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+/* Custom background colors */
+.bg-primary-dark {
+    background-color: #0062cc;
+}
+.bg-success-dark {
+    background-color: #1e7e34;
+}
+.bg-info-dark {
+    background-color: #117a8b;
+}
+.bg-danger-dark {
+    background-color: #bd2130;
+}
+
+/* Due date badges */
+.badge-task {
+    font-size: 0.8em;
+}
+
+/* Form section styling */
+.form-section {
+    margin-bottom: 2rem;
+    border-radius: 0.25rem;
+    padding: 1rem;
+    background-color: #f8f9fa;
+}
+
+.form-section-header {
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #dee2e6;
+}
+
+/* Custom checkboxes */
+.custom-checkbox .custom-control-input:checked ~ .custom-control-label::before {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+/* Category color indicators */
+.category-color-indicator {
+    width: 15px;
+    height: 15px;
+    display: inline-block;
+    margin-right: 5px;
+    border-radius: 50%;
+    vertical-align: middle;
+}
+
+/* Task toggle button animation */
+.task-status-toggle {
+    transition: all 0.2s;
+}
+
+/* Responsive adjustments */
+@media (max-width: 767.98px) {
+    .sidebar {
+        position: static;
+    }
+    .btn-responsive {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+        line-height: 1.5;
+    }
+}

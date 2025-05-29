@@ -3,66 +3,191 @@
 {% block title %}Task List | To-Do App{% endblock %}
 
 {% block content %}
-<div class="row mb-4">    <div class="col">
-        <h1 class="display-5">
-            <i class="fas fa-clipboard-list me-3"></i>My Tasks
-        </h1>
-    </div>
-    <div class="col-auto align-self-center">
-        <a href="{% url 'create_task' %}" class="btn btn-primary">
-            <i class="fas fa-plus me-1"></i>New Task
-        </a>
-    </div>
-</div>
-
-{% if tasks %}
-    <div class="card shadow-sm">
-        <div class="list-group list-group-flush">
-            {% for task in tasks %}                <a href="{% url 'task_detail' task_id=task.id %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3">
-                    <div>
-                        <div class="d-flex align-items-center">
-                            <form action="{% url 'toggle_task_status' task_id=task.id %}" method="post" class="me-3">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-sm {% if task.completed %}btn-success{% else %}btn-outline-secondary{% endif %} rounded-circle" style="width: 32px; height: 32px;">
-                                    {% if task.completed %}
-                                        <i class="fas fa-check"></i>
-                                    {% endif %}
-                                </button>
-                            </form>
-                            <h5 class="mb-1 {% if task.completed %}completed-task{% endif %}">
-                                {{ task.title }}
-                                
-                                {% if task.is_overdue %}
-                                    <span class="badge bg-danger badge-task">Overdue</span>
-                                {% endif %}
-                                
-                                {% if task.due_date and not task.is_overdue %}
-                                    <span class="badge bg-info badge-task">Due: {{ task.due_date|date:"M d, Y" }}</span>
-                                {% endif %}
-                            </h5>
-                        </div>
-                        {% if task.description %}
-                            <p class="text-muted mb-0 small">{{ task.description|truncatechars:100 }}</p>
-                        {% endif %}
-                    </div>
-                    <div>
-                        <small class="text-muted">{{ task.created_at|date:"M d, Y" }}</small>                        <a href="{% url 'edit_task' task_id=task.id %}" class="btn btn-sm btn-outline-primary ms-2">
-                            <i class="fas fa-edit"></i>
+<div class="row">
+    <!-- Sidebar with filters -->
+    <div class="col-lg-3 mb-4">
+        <div class="card shadow-sm sidebar">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-filter me-2"></i>Filter Tasks</h5>
+            </div>
+            <div class="card-body">
+                <form method="get" action="{% url 'task_list' %}">
+                    {{ filter_form.as_p }}
+                    <div class="d-grid gap-2 mt-3">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search me-1"></i>Apply Filters
+                        </button>
+                        <a href="{% url 'task_list' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times me-1"></i>Clear Filters
                         </a>
                     </div>
+                </form>
+            </div>
+            <div class="card-footer">
+                <div class="list-group list-group-flush">
+                    <a href="{% url 'task_list' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <div><i class="fas fa-tasks me-2"></i>All Tasks</div>
+                        <span class="badge bg-primary rounded-pill">{{ total_tasks }}</span>
+                    </a>
+                    <a href="{% url 'task_list' %}?status=active" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <div><i class="fas fa-hourglass-half me-2"></i>Active</div>
+                        <span class="badge bg-info rounded-pill">{{ active_tasks }}</span>
+                    </a>
+                    <a href="{% url 'task_list' %}?status=completed" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <div><i class="fas fa-check-circle me-2"></i>Completed</div>
+                        <span class="badge bg-success rounded-pill">{{ completed_tasks }}</span>
+                    </a>
+                    <a href="{% url 'task_list' %}?status=overdue" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <div><i class="fas fa-clock me-2"></i>Overdue</div>
+                        <span class="badge bg-danger rounded-pill">{{ overdue_tasks }}</span>
+                    </a>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="d-grid">
+                    <a href="{% url 'export_tasks' %}" class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-file-export me-1"></i>Export to CSV
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main content -->
+    <div class="col-lg-9">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h2">
+                <i class="fas fa-clipboard-list me-2"></i>My Tasks
+            </h1>
+            <div>
+                <a href="{% url 'task_create' %}" class="btn btn-primary">
+                    <i class="fas fa-plus me-1"></i>New Task
                 </a>
-            {% endfor %}
+            </div>
         </div>
+
+        {% if tasks %}
+            <!-- Task list -->
+            <div class="card shadow-sm">
+                <div class="list-group list-group-flush">
+                    {% for task in tasks %}
+                        <a href="{% url 'task_detail' task_id=task.id %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3 priority-{{ task.priority }}">
+                            <div>
+                                <div class="d-flex align-items-center">
+                                    <form action="{% url 'toggle_task_status' task_id=task.id %}" method="post" class="me-3">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm task-status-toggle {% if task.completed %}btn-success{% else %}btn-outline-secondary{% endif %} rounded-circle" style="width: 32px; height: 32px;">
+                                            {% if task.completed %}
+                                                <i class="fas fa-check"></i>
+                                            {% endif %}
+                                        </button>
+                                    </form>
+                                    <div>
+                                        <h5 class="mb-1 {% if task.completed %}completed-task{% endif %}" id="task-title-{{ task.id }}">
+                                            {{ task.title }}
+                                            
+                                            {% if task.is_overdue %}
+                                                <span class="badge bg-danger badge-task">Overdue</span>
+                                            {% endif %}
+                                            
+                                            {% if task.due_date and not task.is_overdue %}
+                                                <span class="badge bg-info badge-task">Due: {{ task.due_date|date:"M d, Y" }}</span>
+                                            {% endif %}
+                                            
+                                            <!-- Priority badge -->
+                                            <span class="badge bg-{{ task.priority_display_class }} badge-task">
+                                                {{ task.get_priority_display }}
+                                            </span>
+                                        </h5>
+                                        
+                                        {% if task.category %}
+                                            <div class="mb-1">
+                                                <span class="badge bg-{{ task.category.color }}">{{ task.category.name }}</span>
+                                            </div>
+                                        {% endif %}
+                                        
+                                        {% if task.tags.all %}
+                                            <div class="mb-1">
+                                                {% for tag in task.tags.all %}
+                                                    <span class="badge bg-secondary tag-badge">{{ tag.name }}</span>
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                        
+                                        {% if task.description %}
+                                            <p class="text-muted mb-0 small">{{ task.description|truncatechars:100 }}</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <small class="text-muted d-block mb-1">{{ task.created_at|date:"M d, Y" }}</small>
+                                <div class="btn-group">
+                                    <a href="{% url 'task_edit' task_id=task.id %}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{% url 'task_delete' task_id=task.id %}" class="btn btn-sm btn-outline-danger">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <!-- Pagination -->
+            <div class="pagination justify-content-center mt-4">
+                <nav>
+                    <ul class="pagination">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}">&laquo; First</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}">Previous</a>
+                            </li>
+                        {% endif %}
+                        
+                        <li class="page-item disabled">
+                            <span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+                        </li>
+                        
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}">Next</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}">Last &raquo;</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <div class="display-1 text-muted mb-4">
+                    <i class="fas fa-clipboard-check"></i>
+                </div>
+                <h2 class="mb-4">No tasks found!</h2>
+                <p class="lead">Ready to be productive? Start by adding your first task.</p>
+                <a href="{% url 'task_create' %}" class="btn btn-lg btn-primary">
+                    <i class="fas fa-plus me-2"></i>Add Your First Task
+                </a>
+            </div>
+        {% endif %}
     </div>
-{% else %}
-    <div class="text-center py-5">
-        <div class="display-1 text-muted mb-4">
-            <i class="fas fa-clipboard-check"></i>
-        </div>
-        <h2 class="mb-4">No tasks yet!</h2>
-        <p class="lead">Ready to be productive? Start by adding your first task.</p>        <a href="{% url 'create_task' %}" class="btn btn-lg btn-primary">
-            <i class="fas fa-plus me-2"></i>Add Your First Task
-        </a>
-    </div>
-{% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Initialize Select2 for tags filter
+        $('.select2').select2({
+            theme: 'bootstrap-5',
+            placeholder: "Filter by tags"
+        });
+    });
+</script>
 {% endblock %}

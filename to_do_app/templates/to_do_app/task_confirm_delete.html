@@ -3,9 +3,11 @@
 {% block title %}Delete Task | To-Do App{% endblock %}
 
 {% block content %}
-<nav aria-label="breadcrumb">    <ol class="breadcrumb">
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
         <li class="breadcrumb-item"><a href="{% url 'task_list' %}">Tasks</a></li>
-        <li class="breadcrumb-item"><a href="{% url 'task_detail' task_id=task.id %}">{{ task.title|truncatechars:30 }}</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'task_detail' task_id=object.id %}">{{ object.title|truncatechars:30 }}</a></li>
         <li class="breadcrumb-item active">Delete</li>
     </ol>
 </nav>
@@ -14,7 +16,7 @@
     <div class="col-lg-6">
         <div class="card shadow-sm border-danger">
             <div class="card-header bg-danger text-white">
-                <h1 class="h3 mb-0">Delete Task</h1>
+                <h1 class="h3 mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Delete Task</h1>
             </div>
             <div class="card-body">
                 <div class="alert alert-warning">
@@ -23,15 +25,44 @@
                 </div>
                 
                 <p class="lead">Are you sure you want to delete the task:</p>
-                <h3 class="mb-4">"{{ task.title }}"?</h3>
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h3 class="mb-2">{{ object.title }}</h3>
+                        
+                        {% if object.description %}
+                            <p class="text-muted">{{ object.description|truncatechars:150 }}</p>
+                        {% endif %}
+                        
+                        <div class="mt-3">
+                            {% if object.category %}
+                                <span class="badge bg-{{ object.category.color }} me-2">{{ object.category.name }}</span>
+                            {% endif %}
+                            
+                            <span class="badge bg-{{ object.priority_display_class }} me-2">
+                                {{ object.get_priority_display }} Priority
+                            </span>
+                            
+                            {% if object.due_date %}
+                                <span class="badge {% if object.is_overdue %}bg-danger{% else %}bg-info{% endif %} me-2">
+                                    Due: {{ object.due_date|date:"M d, Y" }}
+                                </span>
+                            {% endif %}
+                            
+                            {% for tag in object.tags.all %}
+                                <span class="badge bg-secondary tag-badge">{{ tag.name }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
                 
                 <form method="post">
                     {% csrf_token %}
                     
                     <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-danger">
+                        <button type="submit" class="btn btn-danger btn-lg">
                             <i class="fas fa-trash me-1"></i>Yes, Delete Task
-                        </button>                        <a href="{% url 'task_detail' task_id=task.id %}" class="btn btn-outline-secondary">
+                        </button>
+                        <a href="{% url 'task_detail' task_id=object.id %}" class="btn btn-outline-secondary">
                             <i class="fas fa-times me-1"></i>Cancel
                         </a>
                     </div>

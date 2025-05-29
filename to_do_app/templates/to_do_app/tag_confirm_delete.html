@@ -1,0 +1,46 @@
+{% extends 'to_do_app/base.html' %}
+
+{% block title %}Delete Tag | To-Do App{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'tag_list' %}">Tags</a></li>
+        <li class="breadcrumb-item active">Delete {{ object.name }}</li>
+    </ol>
+</nav>
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-danger text-white">
+                <h1 class="h3 mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Delete Tag</h1>
+            </div>
+            <div class="card-body">
+                <p class="lead mb-0">Are you sure you want to delete the tag <strong>"{{ object.name }}"</strong>?</p>
+                
+                {% if object.tasks.exists %}
+                    <div class="alert alert-warning mt-3">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        <strong>Warning:</strong> This tag is assigned to {{ object.tasks.count }} task(s). 
+                        Deleting it will remove the tag from these tasks.
+                    </div>
+                {% endif %}
+                
+                <form method="post" class="mt-4">
+                    {% csrf_token %}
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash me-1"></i>Yes, Delete Tag
+                        </button>
+                        <a href="{% url 'tag_list' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times me-1"></i>Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

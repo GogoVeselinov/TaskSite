@@ -3,7 +3,9 @@
 {% block title %}{{ title }} | To-Do App{% endblock %}
 
 {% block content %}
-<nav aria-label="breadcrumb">    <ol class="breadcrumb">
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
         <li class="breadcrumb-item"><a href="{% url 'task_list' %}">Tasks</a></li>
         {% if task %}
             <li class="breadcrumb-item"><a href="{% url 'task_detail' task_id=task.id %}">{{ task.title|truncatechars:30 }}</a></li>
@@ -17,7 +19,7 @@
 <div class="row justify-content-center">
     <div class="col-lg-8">
         <div class="card shadow-sm">
-            <div class="card-header">
+            <div class="card-header bg-primary text-white">
                 <h1 class="h3 mb-0">{{ title }}</h1>
             </div>
             <div class="card-body">
@@ -28,42 +30,124 @@
                         <div class="alert alert-danger">{{ error }}</div>
                     {% endfor %}
                     
-                    <div class="mb-3">
-                        <label for="{{ form.title.id_for_label }}" class="form-label">{{ form.title.label }}</label>
-                        {{ form.title }}
-                        {% if form.title.errors %}
-                            <div class="invalid-feedback d-block">{{ form.title.errors.0 }}</div>
-                        {% endif %}
+                    <!-- Basic Information Section -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Basic Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="{{ form.title.id_for_label }}" class="form-label fw-bold">{{ form.title.label }}</label>
+                                {{ form.title }}
+                                {% if form.title.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.title.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="{{ form.description.id_for_label }}" class="form-label fw-bold">{{ form.description.label }}</label>
+                                {{ form.description }}
+                                {% if form.description.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.description.errors.0 }}</div>
+                                {% endif %}
+                                <div class="form-text">Provide a detailed description of the task (optional)</div>
+                            </div>
+                        </div>
                     </div>
                     
-                    <div class="mb-3">
-                        <label for="{{ form.description.id_for_label }}" class="form-label">{{ form.description.label }}</label>
-                        {{ form.description }}
-                        {% if form.description.errors %}
-                            <div class="invalid-feedback d-block">{{ form.description.errors.0 }}</div>
-                        {% endif %}
-                        <div class="form-text">Optional</div>
+                    <!-- Organization Section -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0"><i class="fas fa-folder me-2"></i>Organization</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.category.id_for_label }}" class="form-label fw-bold">{{ form.category.label }}</label>
+                                    {{ form.category }}
+                                    {% if form.category.errors %}
+                                        <div class="invalid-feedback d-block">{{ form.category.errors.0 }}</div>
+                                    {% endif %}
+                                    <div class="form-text">Group your task by category</div>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.priority.id_for_label }}" class="form-label fw-bold">{{ form.priority.label }}</label>
+                                    {{ form.priority }}
+                                    {% if form.priority.errors %}
+                                        <div class="invalid-feedback d-block">{{ form.priority.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="{{ form.tags.id_for_label }}" class="form-label fw-bold">{{ form.tags.label }}</label>
+                                {{ form.tags }}
+                                {% if form.tags.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.tags.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="{{ form.new_tags.id_for_label }}" class="form-label fw-bold">{{ form.new_tags.label }}</label>
+                                {{ form.new_tags }}
+                                {% if form.new_tags.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.new_tags.errors.0 }}</div>
+                                {% endif %}
+                                <div class="form-text">{{ form.new_tags.help_text }}</div>
+                            </div>
+                        </div>
                     </div>
                     
-                    <div class="mb-3">
-                        <label for="{{ form.due_date.id_for_label }}" class="form-label">{{ form.due_date.label }}</label>
-                        {{ form.due_date }}
-                        {% if form.due_date.errors %}
-                            <div class="invalid-feedback d-block">{{ form.due_date.errors.0 }}</div>
-                        {% endif %}
-                        <div class="form-text">Optional</div>
+                    <!-- Scheduling Section -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Scheduling</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="{{ form.due_date.id_for_label }}" class="form-label fw-bold">{{ form.due_date.label }}</label>
+                                {{ form.due_date }}
+                                {% if form.due_date.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.due_date.errors.0 }}</div>
+                                {% endif %}
+                                <div class="form-text">When is this task due? (optional)</div>
+                            </div>
+                            
+                            <div class="mb-3 form-check">
+                                {{ form.completed }}
+                                <label for="{{ form.completed.id_for_label }}" class="form-check-label fw-bold">{{ form.completed.label }}</label>
+                                {% if form.completed.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.completed.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
                     </div>
                     
-                    <div class="mb-4 form-check">
-                        {{ form.completed }}
-                        <label for="{{ form.completed.id_for_label }}" class="form-check-label">{{ form.completed.label }}</label>
+                    <!-- Additional Notes Section -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0"><i class="fas fa-sticky-note me-2"></i>Additional Notes</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="{{ form.notes.id_for_label }}" class="form-label fw-bold">{{ form.notes.label }}</label>
+                                {{ form.notes }}
+                                {% if form.notes.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.notes.errors.0 }}</div>
+                                {% endif %}
+                                <div class="form-text">Any additional context or reference information for this task</div>
+                            </div>
+                        </div>
                     </div>
                     
+                    <!-- Action buttons -->
                     <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save me-1"></i>Save Task
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-save me-2"></i>Save Task
                         </button>
-                        {% if task %}                            <a href="{% url 'task_detail' task_id=task.id %}" class="btn btn-outline-secondary">Cancel</a>
+                        {% if task %}
+                            <a href="{% url 'task_detail' task_id=task.id %}" class="btn btn-outline-secondary">Cancel</a>
                         {% else %}
                             <a href="{% url 'task_list' %}" class="btn btn-outline-secondary">Cancel</a>
                         {% endif %}
@@ -76,21 +160,26 @@
 {% endblock %}
 
 {% block extra_js %}
-{% if not task %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var now = new Date();
-        var isoString = now.toISOString().slice(0, 16);
-
-        var dueDateInput = document.getElementById('{{ form.due_date.auto_id }}');
-        if (dueDateInput) {
-            dueDateInput.setAttribute('min', isoString);
-        }
-    });
-</script>
-{% endif %}
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
+    $(document).ready(function() {
+        // Initialize Select2 for tags
+        $('.select2').select2({
+            theme: 'bootstrap-5',
+            placeholder: "Select tags"
+        });
+        
+        // Set minimum date for due date field
+        {% if not task %}
+            var now = new Date();
+            var isoString = now.toISOString().slice(0, 16);
+            
+            var dueDateInput = document.getElementById('{{ form.due_date.auto_id }}');
+            if (dueDateInput) {
+                dueDateInput.setAttribute('min', isoString);
+            }
+        {% endif %}
+        
+        // Focus on title field
         var titleInput = document.getElementById('{{ form.title.auto_id }}');
         if (titleInput) {
             titleInput.focus();
