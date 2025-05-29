@@ -1,0 +1,43 @@
+{% extends 'to_do_app/base.html' %}
+
+{% block title %}Delete Task | To-Do App{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'task_list' %}">Tasks</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'task_detail' task_id=task.id %}">{{ task.title|truncatechars:30 }}</a></li>
+        <li class="breadcrumb-item active">Delete</li>
+    </ol>
+</nav>
+
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card shadow-sm border-danger">
+            <div class="card-header bg-danger text-white">
+                <h1 class="h3 mb-0">Delete Task</h1>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    This action cannot be undone
+                </div>
+                
+                <p class="lead">Are you sure you want to delete the task:</p>
+                <h3 class="mb-4">"{{ task.title }}"?</h3>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash me-1"></i>Yes, Delete Task
+                        </button>                        <a href="{% url 'task_detail' task_id=task.id %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times me-1"></i>Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
